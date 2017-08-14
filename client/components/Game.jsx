@@ -171,7 +171,7 @@ export default class Game extends React.Component {
       this.discardCard(hasDefuse)
 
       let min = 0
-      let max = this.state.deck - 1
+      let max = this.state.deck.length - 1
       let randomIndex = Math.floor(Math.random() * (max - min + 1)) + min
       gameDeck.splice(randomIndex,0, drawnCard)
 

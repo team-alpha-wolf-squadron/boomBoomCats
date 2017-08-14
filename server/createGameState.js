@@ -87,6 +87,7 @@ let createGameState = function(callback) {
 
           //insert bombs into the deck
           while (bombs.length > 0) {
+            let max = gameState.deck.length
             let randomIndex = Math.floor(Math.random() * (max - min + 1)) + min
             gameState.deck.splice(randomIndex, 0, bombs.pop())
 
