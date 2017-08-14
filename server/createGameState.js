@@ -83,7 +83,6 @@ let createGameState = function(callback) {
           `)
 
           let min = 0
-          let max = gameState.deck.length
 
           //insert bombs into the deck
           while (bombs.length > 0) {
