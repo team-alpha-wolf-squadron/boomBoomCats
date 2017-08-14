@@ -5,7 +5,9 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
 const app = express()
-const PORT = process.env.PORT || 3000
+const PORT = 
+// process.env.PORT ||
+  3000
 
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
@@ -74,6 +76,11 @@ io.on('connection', function(socket) {
   socket.on('attack card', function(newTurns, newBombCount, room) {
     console.log(room, ': heard a player got attacked. update it boiz')
     io.to(room).emit('update turn', newTurns, newBombCount)
+  })
+
+  socket.on('skip turn', function(room) {
+    console.log(room, ': player skipped.')
+    io.to(room).emit('turn skipped')
   })
 
   socket.on('ended turn', function(newTurns, newBombCount, room) {

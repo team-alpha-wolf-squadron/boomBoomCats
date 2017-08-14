@@ -79,6 +79,12 @@ export default class Game extends React.Component {
       console.log(player, ' saw the future of the deck!')
     }.bind(this))
 
+    this.props.socket.on('turn skipped', function() {
+      this.setState({
+        status: 'USER CHEATED!! USER SKIPPED THEIR TURN!!!!'
+      })
+    }.bind(this))
+
     this.props.socket.on('update discard', function(updatedDiscard, newHand) {
       this.setState({
         discard: updatedDiscard,
@@ -106,11 +112,8 @@ export default class Game extends React.Component {
     this.props.socket.on('bomb less', function() {
       this.setState({
         exploderCount: this.state.exploderCount - 1
-<<<<<<< HEAD
       }, () => {
         console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', this.state.exploderCount)
-=======
->>>>>>> Render Status Component
       })
     }.bind(this))
 
@@ -137,7 +140,10 @@ export default class Game extends React.Component {
 
     } else if (cardName === 'skip') {
 
-      this.skipATurn(handIndex)
+      this.skipATurn(handIndex, ()=>{
+        console.log('in the process of skipping a turn')
+        this.props.socket.emit('skip turn', this.state.room)
+      })
 
     } else if (cardName === 'see-the-future') {
 
