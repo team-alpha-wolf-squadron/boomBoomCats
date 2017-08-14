@@ -22,7 +22,6 @@ app.get('*', function (request, response){
 })
 
 var users = {}
-var queueList = []
 var roomnum = 1;
 var roomUsers = {};
 io.on('connection', function(socket) {
@@ -31,18 +30,17 @@ io.on('connection', function(socket) {
   socket.on('addUser', function(name) {
     users[socket.id] = name
     roomUsers[socket.id] = name
-    queueList.push(socket.id)
     console.log(users)
     var newRoom = `room${roomnum}`;
     socket.join(newRoom)
     let srvSockets = io.sockets.sockets
-    if(queueList.length===4){
+    if(Object.keys(roomUsers).length === 4){
       console.log('initializing game for room ', newRoom);
       
       createGameState( (gameState) => {
         io.to(newRoom).emit('game start', gameState, roomUsers, newRoom)
-        for(var user in roomUsers){
-          delete roomUsers[queueList.shift()]
+        for(var userid in roomUsers){
+          delete roomUsers[userid]
         }
       } )
       roomnum++
@@ -97,6 +95,9 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {
     console.log('a user disconnected....')
     delete users[socket.id]
+    if(roomUsers[socket.id]){
+      delete roomUsers[socket.id]
+    }
     console.log(users)
   })
 })
