@@ -9745,8 +9745,12 @@ var Game = function (_React$Component) {
       }.bind(this));
 
       this.props.socket.on('bomb less', function () {
+        var _this2 = this;
+
         this.setState({
           exploderCount: this.state.exploderCount - 1
+        }, function () {
+          console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', _this2.state.exploderCount);
         });
       }.bind(this));
 
@@ -9759,18 +9763,18 @@ var Game = function (_React$Component) {
   }, {
     key: 'handleCardClick',
     value: function handleCardClick(cardName, handIndex) {
-      var _this2 = this;
+      var _this3 = this;
 
       console.log('handling card click on game level');
       if (cardName === 'attack') {
 
         this.attackNextPlayer(handIndex, function () {
-          _this2.props.socket.emit('attack card', _this2.state.turn, _this2.state.exploderCount);
+          _this3.props.socket.emit('attack card', _this3.state.turn, _this3.state.exploderCount);
         });
       } else if (cardName === 'shuffle') {
 
         this.shuffleDeck(handIndex, function () {
-          _this2.props.socket.emit('shuffle card', _this2.state.deck);
+          _this3.props.socket.emit('shuffle card', _this3.state.deck);
         });
       } else if (cardName === 'skip') {
 
@@ -9778,7 +9782,7 @@ var Game = function (_React$Component) {
       } else if (cardName === 'see-the-future') {
 
         this.seeTheFuture(handIndex, function () {
-          _this2.props.socket.emit('future card', _this2.state.playerId);
+          _this3.props.socket.emit('future card', _this3.state.playerId);
         });
       }
     }
