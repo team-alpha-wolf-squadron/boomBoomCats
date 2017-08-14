@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 let db // mongo
-const dbURL = process.env.dbURL //TODO: remove // for dev|| require('../env/config.js');
+const dbURL = process.env.dbURL || require('../env/config.js');
 const createGameState = require('./createGameState')
 
 app.use(parser.urlencoded({extended: true}))
@@ -21,67 +21,76 @@ app.get('*', function (request, response){
 })
 
 var users = {}
-
+var queueList = []
+var roomnum = 1;
+var roomUsers = {};
 io.on('connection', function(socket) {
   console.log('a user connected!!!')
 
   socket.on('addUser', function(name) {
     users[socket.id] = name
+    roomUsers[socket.id] = name
+    queueList.push(socket.id)
     console.log(users)
-
-    // Detect the number of players before starting game
+    var newRoom = `room${roomnum}`;
+    socket.join(newRoom)
     let srvSockets = io.sockets.sockets
-    if (Object.keys(srvSockets).length === 4) {
-      console.log(`game initalized! players are ${Object.keys(srvSockets)}`)
+    if(queueList.length===4){
+      console.log('initializing game for room ', newRoom);
+      
       createGameState( (gameState) => {
-        io.emit('game start', gameState, users)
+        io.to(newRoom).emit('game start', gameState, roomUsers, newRoom)
+        for(var user in roomUsers){
+          delete roomUsers[queueList.shift()]
+        }
       } )
+      roomnum++
     }
-
-    io.emit('new opponent', users)
+    console.log(newRoom)
+    io.to(newRoom).emit('new opponent', roomUsers)
 
   })
 
-  socket.on('shuffle card', function(deck) {
-    console.log('shuffled deck! emitting to other players...')
-    io.emit('shuffle deck', deck)
+  socket.on('shuffle card', function(deck, room) {
+    console.log(room, ': shuffled deck! emitting to other players...')
+    io.to(room).emit('shuffle deck', deck)
   })
 
-  socket.on('future card', function(player) {
-    console.log('user saw the future!!')
-    io.emit('saw future', player)
+  socket.on('future card', function(player, room) {
+    console.log(room,': user saw the future!!')
+    io.to(room).emit('saw future', player)
   })
 
-  socket.on('discarded', function(updatedDiscard, newHand) {
-    console.log('everyone, time to update your discard piles')
-    io.emit('update discard', updatedDiscard, newHand)
+  socket.on('discarded', function(updatedDiscard, newHand, room) {
+    console.log(room,': everyone, time to update your discard piles')
+    io.to(room).emit('update discard', updatedDiscard, newHand)
   })
 
-  socket.on('drew card', function(newDeck, newHand) {
-    console.log('heard drew card socket from client')
-    io.emit('update deck', newDeck, newHand)
+  socket.on('drew card', function(newDeck, newHand, room) {
+    console.log(room,': heard drew card socket from client')
+    io.to(room).emit('update deck', newDeck, newHand)
   })
 
-  socket.on('attack card', function(newTurns, newBombCount) {
-    console.log('heard a player got attacked. update it boiz')
-    io.emit('update turn', newTurns, newBombCount)
+  socket.on('attack card', function(newTurns, newBombCount, room) {
+    console.log(room, ': heard a player got attacked. update it boiz')
+    io.to(room).emit('update turn', newTurns, newBombCount)
   })
 
-  socket.on('ended turn', function(newTurns, newBombCount) {
-    console.log('WE ENDED THE TURN THIS IS FROM THE SERVER :::: ', newTurns)
-    io.emit('update turn', newTurns, newBombCount)
+  socket.on('ended turn', function(newTurns, newBombCount, room) {
+    console.log(room, ': WE ENDED THE TURN THIS IS FROM THE SERVER :::: ', newTurns)
+    io.to(room).emit('update turn', newTurns, newBombCount)
   })
 
-  socket.on('less bomb', function() {
-    io.emit('bomb less')
+  socket.on('less bomb', function(room) {
+    io.to(room).emit('bomb less')
   })
 
-  socket.on('game over', function() {
-    io.emit('winner found')
+  socket.on('game over', function(room) {
+    io.to(room).emit('winner found')
   })
 
-  socket.on('chat message', function(msg) {
-    io.emit('chat message', msg, users[socket.id])
+  socket.on('chat message', function(msg, room) {
+    io.to(room).emit('chat message', msg, users[socket.id])
   })
 
   socket.on('disconnect', function() {

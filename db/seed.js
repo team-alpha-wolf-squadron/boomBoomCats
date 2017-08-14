@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient
 const assert = require('assert')
 const path = require('path')
 
-const dbURL = process.env.dbURL // TODO: remove // for dev || require(path.join(__dirname, '../env/config.js'));
+const dbURL = process.env.dbURL || require(path.join(__dirname, '../env/config.js'));
 
 const normals = require('./cards/normals.json')
 const diffuses = require('./cards/diffuses.json')
