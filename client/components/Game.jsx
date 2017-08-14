@@ -92,15 +92,12 @@ export default class Game extends React.Component {
     this.props.socket.on('bomb less', function() {
       this.setState({
         exploderCount: this.state.exploderCount - 1
-<<<<<<< HEAD
-=======
       })
     }.bind(this))
 
     this.props.socket.on('winner found', function() {
       this.setState({
         gameOver: true
->>>>>>> some changes
       })
     }.bind(this))
 
