@@ -10,7 +10,13 @@ const PORT = process.env.PORT || 3000
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 let db // mongo
+<<<<<<< HEAD
 const dbURL = process.env.dbURL || require('../env/config.js');
+=======
+const dbURL = 
+  // process.env.dbURL //TODO: remove // for dev||
+  require('../env/config.js')
+>>>>>>> Add status change for card drawn
 const createGameState = require('./createGameState')
 
 app.use(parser.urlencoded({extended: true}))
@@ -22,7 +28,7 @@ app.get('*', function (request, response){
 
 var users = {}
 var roomnum = 1;
-var roomUsers = {};
+var roomUsers = {}
 io.on('connection', function(socket) {
   console.log('a user connected!!!')
 

@@ -96,7 +96,8 @@ export default class Game extends React.Component {
     this.props.socket.on('update deck', function(newDeck, newHand) {
       this.setState({
         deck: newDeck,
-        allPlayers: newHand
+        allPlayers: newHand,
+        status: 'CARD IS DRAWWN!'
       })
       console.log('updated deck and hand!')
       console.log('THIS IS THE NEW HAND FOR THE PLAYER :::: ', this.state.allPlayers[0].hand)
