@@ -9643,8 +9643,6 @@ var _cardFunctions2 = _interopRequireDefault(_cardFunctions);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -9676,7 +9674,8 @@ var Game = function (_React$Component) {
       turn: [],
       seeFutureCards: [],
       exploderCount: 3,
-      gameOver: false
+      gameOver: false,
+      room: ''
     };
     return _this;
   }
@@ -9684,7 +9683,7 @@ var Game = function (_React$Component) {
   _createClass(Game, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      this.props.socket.on('game start', function (gameState, users) {
+      this.props.socket.on('game start', function (gameState, users, roomString) {
         var usersUniqueId = Object.keys(users);
         var userUniqueId = this.props.socket.id;
         var userIndex = usersUniqueId.findIndex(function (e) {
@@ -9702,7 +9701,8 @@ var Game = function (_React$Component) {
           deck: gameState.deck, //array of card objects
           discard: [],
           turn: [0, 1, 2, 3],
-          exploderCount: 3
+          exploderCount: 3,
+          room: roomString
         });
         // console.log('we are in the game component')
         // console.log(`Game Component: usersID is ${JSON.stringify(Object.values(users))}`)
@@ -9756,7 +9756,8 @@ var Game = function (_React$Component) {
 
       this.props.socket.on('winner found', function () {
         this.setState({
-          gameOver: true
+          gameOver: true,
+          turn: newTurn
         });
       }.bind(this));
     }
@@ -9769,12 +9770,12 @@ var Game = function (_React$Component) {
       if (cardName === 'attack') {
 
         this.attackNextPlayer(handIndex, function () {
-          _this3.props.socket.emit('attack card', _this3.state.turn, _this3.state.exploderCount);
+          _this3.props.socket.emit('attack card', _this3.state.turn, _this3.state.exploderCount, _this3.state.room);
         });
       } else if (cardName === 'shuffle') {
 
         this.shuffleDeck(handIndex, function () {
-          _this3.props.socket.emit('shuffle card', _this3.state.deck);
+          _this3.props.socket.emit('shuffle card', _this3.state.deck, _this3.state.room);
         });
       } else if (cardName === 'skip') {
 
@@ -9782,7 +9783,7 @@ var Game = function (_React$Component) {
       } else if (cardName === 'see-the-future') {
 
         this.seeTheFuture(handIndex, function () {
-          _this3.props.socket.emit('future card', _this3.state.playerId);
+          _this3.props.socket.emit('future card', _this3.state.playerId, _this3.state.room);
         });
       }
     }
@@ -9818,8 +9819,8 @@ var Game = function (_React$Component) {
             newPlayersHand.push(this.state.allPlayers[i]);
           }
         }
-        this.props.socket.emit('drew card', gameDeck, newPlayersHand);
-        this.props.socket.emit('less bomb');
+        this.props.socket.emit('drew card', gameDeck, newPlayersHand, this.state.room);
+        this.props.socket.emit('less bomb', this.state.room);
         this.endTurn('dead');
       } else if (drawnCard.type === "bomb" && hasDefuse > -1) {
         //console.log(`in drawACard(), you haz a bomb!!! and you gotta defuse`)
@@ -9851,7 +9852,7 @@ var Game = function (_React$Component) {
           }
         }
 
-        this.props.socket.emit('drew card', gameDeck, _newPlayersHand);
+        this.props.socket.emit('drew card', gameDeck, _newPlayersHand, this.state.room);
 
         this.endTurn();
       } else {
@@ -9874,7 +9875,7 @@ var Game = function (_React$Component) {
         }
 
         console.log('THIS IS THE NEW HAND AFTER CLICKING DRAW BEFORE THE EMIT ::::: ', JSON.stringify(currentPlayerWithUpdatedHand));
-        this.props.socket.emit('drew card', gameDeck, _newPlayersHand2);
+        this.props.socket.emit('drew card', gameDeck, _newPlayersHand2, this.state.room);
 
         this.endTurn();
       }
@@ -9883,7 +9884,7 @@ var Game = function (_React$Component) {
     key: 'endTurn',
     value: function endTurn(status) {
       var gameTurns = this.state.turn.slice();
-
+      var newBombCount = this.state.exploderCount;
       //if there's been an attack or player dead, get rid of the duplicate since it's a one-time thing
       if (status === 'dead') {
         var playerWhoEndedTurn = gameTurns.shift();
@@ -9893,11 +9894,13 @@ var Game = function (_React$Component) {
         for (var i = this.state.allPlayers[this.state.playerIndex].hand.length - 1; i >= 0; i--) {
           this.discardCard(i);
         }
+        newBombCount = this.state.exploderCount - 1;
+
         this.setState({
           exploderCount: this.state.exploderCount - 1
         });
         if (gameTurns.length === 1) {
-          this.props.socket.emit('game over');
+          this.props.socket.emit('game over', this.state.room);
         }
       } else if (this.state.turn[0] === this.state.turn[1]) {
         var _playerWhoEndedTurn = gameTurns.shift();
@@ -9909,7 +9912,7 @@ var Game = function (_React$Component) {
       }
       // this.setState({ turn: gameTurns })
 
-      this.props.socket.emit('ended turn', gameTurns, this.state.exploderCount);
+      this.props.socket.emit('ended turn', gameTurns, this.state.exploderCount, this.state.room);
       console.log('this is the the game turn', gameTurns);
     }
   }, {
@@ -9943,7 +9946,7 @@ var Game = function (_React$Component) {
         }
       }
 
-      this.props.socket.emit('discarded', updatedDiscard, newPlayersHand);
+      this.props.socket.emit('discarded', updatedDiscard, newPlayersHand, this.state.room);
     }
   }, {
     key: 'printAllCardsInDeck',
@@ -9959,8 +9962,6 @@ var Game = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _React$createElement;
-
       var tempOpponents = this.state.allPlayers.slice();
       tempOpponents.splice(this.state.playerIndex, 1);
       var opponents = tempOpponents;
@@ -9989,7 +9990,7 @@ var Game = function (_React$Component) {
         _react2.default.createElement(
           'div',
           null,
-          this.state.allPlayers.length === 4 ? _react2.default.createElement(_InitializedView2.default, (_React$createElement = {
+          this.state.allPlayers.length === 4 ? _react2.default.createElement(_InitializedView2.default, {
             deck: this.state.deck,
             discard: this.state.discard,
             player: player,
@@ -9997,10 +9998,10 @@ var Game = function (_React$Component) {
             opponentsUsernames: opponentsUsernames,
             isPlayerTurn: isPlayerTurn,
             socket: this.props.socket,
-            winner: this.state.allPlayersId[currentPlayerTurn],
             exploderCount: this.state.exploderCount,
-            currentPlayerTurn: currentPlayerTurn
-          }, _defineProperty(_React$createElement, 'winner', this.state.allPlayersId[currentPlayerTurn]), _defineProperty(_React$createElement, 'handleDeckClick', this.handleDeckClick), _defineProperty(_React$createElement, 'gameOver', this.state.gameOver), _defineProperty(_React$createElement, 'handleCardClick', this.handleCardClick), _React$createElement)) : _react2.default.createElement(_LoadingView2.default, { socket: this.props.socket })
+            currentPlayerTurn: currentPlayerTurn,
+            handleDeckClick: this.handleDeckClick,
+            handleCardClick: this.handleCardClick }) : _react2.default.createElement(_LoadingView2.default, { socket: this.props.socket })
         )
       );
     }
@@ -36885,8 +36886,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
     CLIENT_ID: 'Bt93UxMPclylp6P1iwcOY6ofPQsNeSZo',
     DOMAIN: 'michaelkdai.auth0.com',
-    //REDIRECT_URI: 'http://localhost:3000/',
-    REDIRECT_URI: 'https://boomboomcats.herokuapp.com/',
+    REDIRECT_URI: 'http://localhost:3000/',
+    //REDIRECT_URI: 'https://boomboomcats.herokuapp.com/',
     AUDIENCE: 'https://michaelkdai.auth0.com/userinfo'
 };
 
@@ -42679,6 +42680,7 @@ var InitializedView = function InitializedView(props) {
   return _react2.default.createElement(
     'div',
     { className: 'gameTable' },
+    console.log('props.exploderCount ' + props.exploderCount + ' and props.deck.length ' + props.deck.length),
     _react2.default.createElement(_Opponents2.default, { opponents: props.opponents, opponentsUsernames: props.opponentsUsernames, currentPlayerTurn: props.currentPlayerTurn }),
     _react2.default.createElement(
       'div',
