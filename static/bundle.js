@@ -9643,6 +9643,8 @@ var _cardFunctions2 = _interopRequireDefault(_cardFunctions);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -9743,26 +9745,36 @@ var Game = function (_React$Component) {
       }.bind(this));
 
       this.props.socket.on('bomb less', function () {
+        var _this2 = this;
+
         this.setState({
           exploderCount: this.state.exploderCount - 1
+        }, function () {
+          console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', _this2.state.exploderCount);
+        });
+      }.bind(this));
+
+      this.props.socket.on('winner found', function () {
+        this.setState({
+          gameOver: true
         });
       }.bind(this));
     }
   }, {
     key: 'handleCardClick',
     value: function handleCardClick(cardName, handIndex) {
-      var _this2 = this;
+      var _this3 = this;
 
       console.log('handling card click on game level');
       if (cardName === 'attack') {
 
         this.attackNextPlayer(handIndex, function () {
-          _this2.props.socket.emit('attack card', _this2.state.turn, _this2.state.exploderCount);
+          _this3.props.socket.emit('attack card', _this3.state.turn, _this3.state.exploderCount);
         });
       } else if (cardName === 'shuffle') {
 
         this.shuffleDeck(handIndex, function () {
-          _this2.props.socket.emit('shuffle card', _this2.state.deck);
+          _this3.props.socket.emit('shuffle card', _this3.state.deck);
         });
       } else if (cardName === 'skip') {
 
@@ -9770,7 +9782,7 @@ var Game = function (_React$Component) {
       } else if (cardName === 'see-the-future') {
 
         this.seeTheFuture(handIndex, function () {
-          _this2.props.socket.emit('future card', _this2.state.playerId);
+          _this3.props.socket.emit('future card', _this3.state.playerId);
         });
       }
     }
@@ -9885,9 +9897,7 @@ var Game = function (_React$Component) {
           exploderCount: this.state.exploderCount - 1
         });
         if (gameTurns.length === 1) {
-          this.setState({
-            gameOver: true
-          });
+          this.props.socket.emit('game over');
         }
       } else if (this.state.turn[0] === this.state.turn[1]) {
         var _playerWhoEndedTurn = gameTurns.shift();
@@ -9949,6 +9959,8 @@ var Game = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _React$createElement;
+
       var tempOpponents = this.state.allPlayers.slice();
       tempOpponents.splice(this.state.playerIndex, 1);
       var opponents = tempOpponents;
@@ -9977,7 +9989,7 @@ var Game = function (_React$Component) {
         _react2.default.createElement(
           'div',
           null,
-          this.state.allPlayers.length === 4 ? _react2.default.createElement(_InitializedView2.default, {
+          this.state.allPlayers.length === 4 ? _react2.default.createElement(_InitializedView2.default, (_React$createElement = {
             deck: this.state.deck,
             discard: this.state.discard,
             player: player,
@@ -9987,10 +9999,8 @@ var Game = function (_React$Component) {
             socket: this.props.socket,
             winner: this.state.allPlayersId[currentPlayerTurn],
             exploderCount: this.state.exploderCount,
-            currentPlayerTurn: currentPlayerTurn,
-            handleDeckClick: this.handleDeckClick,
-            gameOver: this.state.gameOver,
-            handleCardClick: this.handleCardClick }) : _react2.default.createElement(_LoadingView2.default, { socket: this.props.socket })
+            currentPlayerTurn: currentPlayerTurn
+          }, _defineProperty(_React$createElement, 'winner', this.state.allPlayersId[currentPlayerTurn]), _defineProperty(_React$createElement, 'handleDeckClick', this.handleDeckClick), _defineProperty(_React$createElement, 'gameOver', this.state.gameOver), _defineProperty(_React$createElement, 'handleCardClick', this.handleCardClick), _React$createElement)) : _react2.default.createElement(_LoadingView2.default, { socket: this.props.socket })
         )
       );
     }
