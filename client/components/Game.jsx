@@ -25,8 +25,7 @@ export default class Game extends React.Component {
       discard: [],
       turn: [],
       seeFutureCards: [],
-      exploderCount: 3,
-      gameOver: false
+      exploderCount: 3
     }
   }
 
@@ -99,7 +98,8 @@ export default class Game extends React.Component {
 
     this.props.socket.on('winner found', function() {
       this.setState({
-        gameOver: true
+        gameOver: true,
+        turn: newTurn
       })
     }.bind(this))
 
@@ -109,7 +109,7 @@ export default class Game extends React.Component {
     console.log('handling card click on game level')
     if (cardName === 'attack') {
 
-      this.attackNextPlayer(handIndex, ()=>{this.props.socket.emit('attack card', this.state.turn, this.state.exploderCount)});
+      this.attackNextPlayer(handIndex, ()=>{this.props.socket.emit('attack card', this.state.turn)});
       
 
     } else if ( cardName === 'shuffle') {
@@ -148,17 +148,6 @@ export default class Game extends React.Component {
       //EMIT BOOM
       alert("Drew a bomb!" + this.state.playerId + "'s cat just got BOOM BOOM'D!")
       hand.unshift(drawnCard)
-      let newPlayersHand = []
-
-      for (let i = 0; i < this.state.allPlayers.length; i++) {
-        if (i === this.state.turn[0]) {
-          newPlayersHand.push(currentPlayer)
-        } else {
-          newPlayersHand.push( this.state.allPlayers[i] )
-        }
-      }
-      this.props.socket.emit('drew card', gameDeck, newPlayersHand)
-      this.props.socket.emit('less bomb')
       this.endTurn('dead')
 
     } else if (drawnCard.type === "bomb" && hasDefuse > -1) {
@@ -225,7 +214,7 @@ export default class Game extends React.Component {
 
   endTurn(status) {
     let gameTurns = this.state.turn.slice()
-
+    let newBombCount = this.state.exploderCount
     //if there's been an attack or player dead, get rid of the duplicate since it's a one-time thing
     if ( status === 'dead') {
       let playerWhoEndedTurn = gameTurns.shift()
@@ -235,12 +224,11 @@ export default class Game extends React.Component {
       for (var i = this.state.allPlayers[this.state.playerIndex].hand.length-1; i >= 0; i--) {
         this.discardCard(i)
       }
+      newBombCount = this.state.exploderCount - 1
+
       this.setState({
         exploderCount: this.state.exploderCount - 1
       })
-      if (gameTurns.length === 1) {
-        this.props.socket.emit('game over')
-      }
     } else if (this.state.turn[0] === this.state.turn[1]){
       let playerWhoEndedTurn = gameTurns.shift()
     } else {
@@ -251,7 +239,7 @@ export default class Game extends React.Component {
     }
     // this.setState({ turn: gameTurns })
 
-    this.props.socket.emit('ended turn', gameTurns, this.state.exploderCount)
+    this.props.socket.emit('ended turn', gameTurns, newBombCount)
     console.log('this is the the game turn', gameTurns)
   }
 
@@ -336,12 +324,9 @@ export default class Game extends React.Component {
             opponentsUsernames={opponentsUsernames} 
             isPlayerTurn={isPlayerTurn}
             socket={this.props.socket}
-            winner={this.state.allPlayersId[currentPlayerTurn]}
             exploderCount={this.state.exploderCount}
             currentPlayerTurn = {currentPlayerTurn}
-            winner = {this.state.allPlayersId[currentPlayerTurn]}
             handleDeckClick={this.handleDeckClick}
-            gameOver = {this.state.gameOver}
             handleCardClick={this.handleCardClick}/> :
           <LoadingView socket={this.props.socket} /> }
       </div>
