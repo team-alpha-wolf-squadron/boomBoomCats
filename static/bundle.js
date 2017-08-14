@@ -9755,7 +9755,8 @@ var Game = function (_React$Component) {
       this.props.socket.on('update deck', function (newDeck, newHand) {
         this.setState({
           deck: newDeck,
-          allPlayers: newHand
+          allPlayers: newHand,
+          status: 'CARD IS DRAWWN!'
         });
         console.log('updated deck and hand!');
         console.log('THIS IS THE NEW HAND FOR THE PLAYER :::: ', this.state.allPlayers[0].hand);
@@ -36924,8 +36925,13 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
     CLIENT_ID: 'Bt93UxMPclylp6P1iwcOY6ofPQsNeSZo',
     DOMAIN: 'michaelkdai.auth0.com',
+<<<<<<< HEAD
     //REDIRECT_URI: 'http://localhost:3000/',
     REDIRECT_URI: 'https://boomboomcats.herokuapp.com/',
+=======
+    REDIRECT_URI: 'http://localhost:3000/',
+    // REDIRECT_URI: 'https://boomboomcats.herokuapp.com/',
+>>>>>>> Add status change for card drawn
     AUDIENCE: 'https://michaelkdai.auth0.com/userinfo'
 };
 
