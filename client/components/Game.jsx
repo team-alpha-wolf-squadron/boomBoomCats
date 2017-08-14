@@ -8,8 +8,6 @@ import InitializedView from './InitializedView.jsx'
 import cardFunctions from '../function/cardFunctions.js'
 import Status from './Status.jsx'
 
-
-
 export default class Game extends React.Component {
   constructor(props) {
     super(props)
