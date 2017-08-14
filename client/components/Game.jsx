@@ -92,6 +92,15 @@ export default class Game extends React.Component {
     this.props.socket.on('bomb less', function() {
       this.setState({
         exploderCount: this.state.exploderCount - 1
+<<<<<<< HEAD
+=======
+      })
+    }.bind(this))
+
+    this.props.socket.on('winner found', function() {
+      this.setState({
+        gameOver: true
+>>>>>>> some changes
       })
     }.bind(this))
 
@@ -233,9 +242,7 @@ export default class Game extends React.Component {
         exploderCount: this.state.exploderCount - 1
       })
       if (gameTurns.length === 1) {
-        this.setState({
-          gameOver: true
-        })
+        this.props.socket.emit('game over')
       }
     } else if (this.state.turn[0] === this.state.turn[1]){
       let playerWhoEndedTurn = gameTurns.shift()
@@ -335,6 +342,7 @@ export default class Game extends React.Component {
             winner={this.state.allPlayersId[currentPlayerTurn]}
             exploderCount={this.state.exploderCount}
             currentPlayerTurn = {currentPlayerTurn}
+            winner = {this.state.allPlayersId[currentPlayerTurn]}
             handleDeckClick={this.handleDeckClick}
             gameOver = {this.state.gameOver}
             handleCardClick={this.handleCardClick}/> :

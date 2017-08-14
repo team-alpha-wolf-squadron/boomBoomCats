@@ -76,6 +76,10 @@ io.on('connection', function(socket) {
     io.emit('bomb less')
   })
 
+  socket.on('game over', function() {
+    io.emit('winner found')
+  })
+
   socket.on('chat message', function(msg) {
     io.emit('chat message', msg, users[socket.id])
   })
