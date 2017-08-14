@@ -10,11 +10,8 @@ const PORT = process.env.PORT || 3000
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 let db // mongo
-<<<<<<< HEAD
-const dbURL = process.env.dbURL || require('../env/config.js'); //TODO: remove // for dev
-=======
+
 const dbURL = process.env.dbURL || require('../env/config.js');
->>>>>>> added room functionality
 const createGameState = require('./createGameState')
 
 app.use(parser.urlencoded({extended: true}))
