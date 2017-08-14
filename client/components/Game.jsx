@@ -101,8 +101,7 @@ export default class Game extends React.Component {
 
     this.props.socket.on('winner found', function() {
       this.setState({
-        gameOver: true,
-        turn: newTurn
+        gameOver: true
       })
     }.bind(this))
 
@@ -341,9 +340,11 @@ export default class Game extends React.Component {
             opponentsUsernames={opponentsUsernames} 
             isPlayerTurn={isPlayerTurn}
             socket={this.props.socket}
+            winner={this.state.allPlayersId[currentPlayerTurn]}
             exploderCount={this.state.exploderCount}
             currentPlayerTurn = {currentPlayerTurn}
             handleDeckClick={this.handleDeckClick}
+            gameOver = {this.state.gameOver}
             handleCardClick={this.handleCardClick}/> :
           <LoadingView socket={this.props.socket} /> }
       </div>
