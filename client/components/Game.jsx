@@ -81,7 +81,7 @@ export default class Game extends React.Component {
 
     this.props.socket.on('turn skipped', function() {
       this.setState({
-        status: 'USER CHEATED!! USER SKIPPED THEIR TURN!!!!'
+        status: 'PLAYER RAN AWAYYYYYY!!!!'
       })
     }.bind(this))
 
@@ -109,11 +109,17 @@ export default class Game extends React.Component {
       })
     }.bind(this))
 
-    this.props.socket.on('bomb less', function() {
+    // this.props.socket.on('bomb less', function() {
+    //   this.setState({
+    //     exploderCount: this.state.exploderCount - 1
+    //   }, () => {
+    //     console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', this.state.exploderCount)
+    //   })
+    // }.bind(this))
+
+    this.props.socket.on('update bombCount', function(bombs) {
       this.setState({
-        exploderCount: this.state.exploderCount - 1
-      }, () => {
-        console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', this.state.exploderCount)
+        exploderCount: bombs
       })
     }.bind(this))
 
@@ -253,19 +259,20 @@ export default class Game extends React.Component {
     if ( status === 'dead') {
       let playerWhoEndedTurn = gameTurns.shift()
       while(gameTurns[0] === playerWhoEndedTurn){
-        gameTurns.shift();
+        gameTurns.shift()
       }
       for (var i = this.state.allPlayers[this.state.playerIndex].hand.length-1; i >= 0; i--) {
         this.discardCard(i)
       }
       newBombCount = this.state.exploderCount - 1
-
-      this.setState({
-        exploderCount: this.state.exploderCount - 1
-      })
+      
+      // this.setState({
+      //   exploderCount: this.state.exploderCount - 1
+      // })
       if (gameTurns.length === 1) {
         this.props.socket.emit('game over', this.state.room)
       }
+      this.props.socket.emit('player died', newBombCount)
     } else if (this.state.turn[0] === this.state.turn[1]){
       let playerWhoEndedTurn = gameTurns.shift()
     } else {
@@ -276,7 +283,7 @@ export default class Game extends React.Component {
     }
     // this.setState({ turn: gameTurns })
 
-    this.props.socket.emit('ended turn', gameTurns, this.state.exploderCount, this.state.room)
+    this.props.socket.emit('ended turn', gameTurns, newBombCount, this.state.room)
     console.log('this is the the game turn', gameTurns)
   }
 

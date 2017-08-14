@@ -10520,7 +10520,7 @@ var Game = function (_React$Component) {
 
       this.props.socket.on('turn skipped', function () {
         this.setState({
-          status: 'USER CHEATED!! USER SKIPPED THEIR TURN!!!!'
+          status: 'PLAYER RAN AWAYYYYYY!!!!'
         });
       }.bind(this));
 
@@ -10548,13 +10548,17 @@ var Game = function (_React$Component) {
         });
       }.bind(this));
 
-      this.props.socket.on('bomb less', function () {
-        var _this3 = this;
+      // this.props.socket.on('bomb less', function() {
+      //   this.setState({
+      //     exploderCount: this.state.exploderCount - 1
+      //   }, () => {
+      //     console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', this.state.exploderCount)
+      //   })
+      // }.bind(this))
 
+      this.props.socket.on('update bombCount', function (bombs) {
         this.setState({
-          exploderCount: this.state.exploderCount - 1
-        }, function () {
-          console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', _this3.state.exploderCount);
+          exploderCount: bombs
         });
       }.bind(this));
 
@@ -10567,29 +10571,29 @@ var Game = function (_React$Component) {
   }, {
     key: 'handleCardClick',
     value: function handleCardClick(cardName, handIndex) {
-      var _this4 = this;
+      var _this3 = this;
 
       console.log('handling card click on game level');
       if (cardName === 'attack') {
 
         this.attackNextPlayer(handIndex, function () {
-          _this4.props.socket.emit('attack card', _this4.state.turn, _this4.state.exploderCount, _this4.state.room);
+          _this3.props.socket.emit('attack card', _this3.state.turn, _this3.state.exploderCount, _this3.state.room);
         });
       } else if (cardName === 'shuffle') {
 
         this.shuffleDeck(handIndex, function () {
-          _this4.props.socket.emit('shuffle card', _this4.state.deck, _this4.state.room);
+          _this3.props.socket.emit('shuffle card', _this3.state.deck, _this3.state.room);
         });
       } else if (cardName === 'skip') {
 
         this.skipATurn(handIndex, function () {
           console.log('in the process of skipping a turn');
-          _this4.props.socket.emit('skip turn', _this4.state.room);
+          _this3.props.socket.emit('skip turn', _this3.state.room);
         });
       } else if (cardName === 'see-the-future') {
 
         this.seeTheFuture(handIndex, function () {
-          _this4.props.socket.emit('future card', _this4.state.playerId, _this4.state.room);
+          _this3.props.socket.emit('future card', _this3.state.playerId, _this3.state.room);
         });
       }
     }
@@ -10702,12 +10706,13 @@ var Game = function (_React$Component) {
         }
         newBombCount = this.state.exploderCount - 1;
 
-        this.setState({
-          exploderCount: this.state.exploderCount - 1
-        });
+        // this.setState({
+        //   exploderCount: this.state.exploderCount - 1
+        // })
         if (gameTurns.length === 1) {
           this.props.socket.emit('game over', this.state.room);
         }
+        this.props.socket.emit('player died', newBombCount);
       } else if (this.state.turn[0] === this.state.turn[1]) {
         var _playerWhoEndedTurn = gameTurns.shift();
       } else {
@@ -10718,7 +10723,7 @@ var Game = function (_React$Component) {
       }
       // this.setState({ turn: gameTurns })
 
-      this.props.socket.emit('ended turn', gameTurns, this.state.exploderCount, this.state.room);
+      this.props.socket.emit('ended turn', gameTurns, newBombCount, this.state.room);
       console.log('this is the the game turn', gameTurns);
     }
   }, {
