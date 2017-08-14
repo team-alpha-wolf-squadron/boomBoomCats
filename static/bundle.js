@@ -9831,7 +9831,7 @@ var Game = function (_React$Component) {
         this.discardCard(hasDefuse);
 
         var min = 0;
-        var max = this.state.deck - 1;
+        var max = this.state.deck.length - 1;
         var randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
         gameDeck.splice(randomIndex, 0, drawnCard);
 
