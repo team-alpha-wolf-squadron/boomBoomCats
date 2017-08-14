@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/team-alpha-wolf-squadron/boomBoomCats#readme",
   "dependencies": {
+    "animated": "^0.2.0",
     "auth0-js": "^8.8.0",
     "axios": "^0.16.2",
     "babel-core": "^6.25.0",

@@ -1,10 +1,14 @@
 import React from 'react'
 import io from 'socket.io-client'
+import animated from 'animated'
 import Opponents from './Opponents.jsx'
 import Player from './Player.jsx'
 import LoadingView from './LoadingView.jsx'
 import InitializedView from './InitializedView.jsx'
 import cardFunctions from '../function/cardFunctions.js'
+import Status from './Status.jsx'
+
+
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -27,7 +31,8 @@ export default class Game extends React.Component {
       seeFutureCards: [],
       exploderCount: 3,
       gameOver: false,
-      room: ''
+      room: '',
+      status: ''
     }
   }
 
@@ -59,11 +64,18 @@ export default class Game extends React.Component {
     this.props.socket.on('shuffle deck', function(deck) {
       this.setState({
         deck: deck
+      }, () => {
+        this.setState({
+          status: 'DECK SHUFFLED!!!'
+        })
       })
       console.log('we shuffled the deck guys')
     }.bind(this))
 
     this.props.socket.on('saw future', function(player) {
+      this.setState({
+        status: 'THE FUTURE HAS BEEN SEEN?!!?!?!!'
+      })
       console.log(player, ' saw the future of the deck!')
     }.bind(this))
 
@@ -94,8 +106,11 @@ export default class Game extends React.Component {
     this.props.socket.on('bomb less', function() {
       this.setState({
         exploderCount: this.state.exploderCount - 1
+<<<<<<< HEAD
       }, () => {
         console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', this.state.exploderCount)
+=======
+>>>>>>> Render Status Component
       })
     }.bind(this))
 
@@ -345,6 +360,7 @@ export default class Game extends React.Component {
             currentPlayerTurn = {currentPlayerTurn}
             handleDeckClick={this.handleDeckClick}
             gameOver = {this.state.gameOver}
+            status={this.state.status}
             handleCardClick={this.handleCardClick}/> :
           <LoadingView socket={this.props.socket} /> }
       </div>

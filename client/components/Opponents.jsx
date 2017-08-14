@@ -18,6 +18,7 @@ export default class Opponents extends React.Component {
           opponents.map((opp, i) => {
             // console.log('these are the opponents usernames on the opponent component', opponentsUsernames)
             return (
+              <div>
               <span className="opponent col-xs-3" key={i}/*opponent={opponentsUsernames[i]} name={opponentsUsernames[i]}*/>
                 <h4>Player:</h4>
 
@@ -30,6 +31,7 @@ export default class Opponents extends React.Component {
                 }
                 </div>
               </span>
+              </div>
             )
           })
         }     
