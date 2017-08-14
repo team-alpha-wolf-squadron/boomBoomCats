@@ -92,6 +92,8 @@ export default class Game extends React.Component {
     this.props.socket.on('bomb less', function() {
       this.setState({
         exploderCount: this.state.exploderCount - 1
+      }, () => {
+        console.log('THIS IS THE NEW EXPLODER COUNT ::::::: ', this.state.exploderCount)
       })
     }.bind(this))
 
