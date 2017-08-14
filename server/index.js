@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 let db // mongo
-const dbURL = process.env.dbURL || require('../env/config.js');
+const dbURL = process.env.dbURL || require('../env/config.js')
 const createGameState = require('./createGameState')
 
 app.use(parser.urlencoded({extended: true}))
@@ -22,7 +22,7 @@ app.get('*', function (request, response){
 
 var users = {}
 var roomnum = 1;
-var roomUsers = {};
+var roomUsers = {}
 io.on('connection', function(socket) {
   console.log('a user connected!!!')
 
@@ -64,13 +64,14 @@ io.on('connection', function(socket) {
     io.to(room).emit('update discard', updatedDiscard, newHand)
   })
 
-  socket.on('drew card', function(newDeck, newHand, room) {
+  socket.on('drew card', function(newDeck, newHand, message, room) {
     console.log(room,': heard drew card socket from client')
-    io.to(room).emit('update deck', newDeck, newHand)
+    io.to(room).emit('update deck', newDeck, newHand, message)
   })
 
   socket.on('attack card', function(newTurns, newBombCount, room) {
     console.log(room, ': heard a player got attacked. update it boiz')
+    io.to(room).emit('attacked')
     io.to(room).emit('update turn', newTurns, newBombCount)
   })
 
@@ -82,6 +83,10 @@ io.on('connection', function(socket) {
   socket.on('ended turn', function(newTurns, newBombCount, room) {
     console.log(room, ': WE ENDED THE TURN THIS IS FROM THE SERVER :::: ', newTurns)
     io.to(room).emit('update turn', newTurns, newBombCount)
+  })
+
+  socket.on('bomb defused', function(room) {
+    io.to(room).emit('defused bomb')
   })
 
   socket.on('less bomb', function(room) {

@@ -79,6 +79,18 @@ export default class Game extends React.Component {
       console.log(player, ' saw the future of the deck!')
     }.bind(this))
 
+    this.props.socket.on('attacked', function() {
+      this.setState({
+        status: 'CATATTACK!'
+      })
+    }.bind(this))
+
+    this.props.socket.on('defused bomb', function() {
+      this.setState({
+        status: 'CLOSE ONE! DEFUSED THE SITUATION!'
+      })
+    }.bind(this))
+
     this.props.socket.on('turn skipped', function() {
       this.setState({
         status: 'PLAYER RAN AWAYYYYYY!!!!'
@@ -93,10 +105,11 @@ export default class Game extends React.Component {
       console.log('discard pile udpated ::: ', this.state.discard)
     }.bind(this))
 
-    this.props.socket.on('update deck', function(newDeck, newHand) {
+    this.props.socket.on('update deck', function(newDeck, newHand, message) {
       this.setState({
         deck: newDeck,
-        allPlayers: newHand
+        allPlayers: newHand,
+        status: message
       })
       console.log('updated deck and hand!')
       console.log('THIS IS THE NEW HAND FOR THE PLAYER :::: ', this.state.allPlayers[0].hand)
@@ -119,7 +132,8 @@ export default class Game extends React.Component {
 
     this.props.socket.on('update bombCount', function(bombs) {
       this.setState({
-        exploderCount: bombs
+        exploderCount: bombs,
+        status: 'KITTY DIED, YOU SHOULD BE ASHAMED!!'
       })
     }.bind(this))
 
@@ -175,7 +189,7 @@ export default class Game extends React.Component {
 
     if (drawnCard.type === "bomb" && hasDefuse === -1 ) { //player has no defuse
       //EMIT BOOM
-      alert("Drew a bomb!" + this.state.playerId + "'s cat just got BOOM BOOM'D!")
+      //alert("Drew a bomb!" + this.state.playerId + "'s cat just got BOOM BOOM'D!")
       hand.unshift(drawnCard)
       let newPlayersHand = []
 
@@ -186,16 +200,17 @@ export default class Game extends React.Component {
           newPlayersHand.push( this.state.allPlayers[i] )
         }
       }
-      this.props.socket.emit('drew card', gameDeck, newPlayersHand, this.state.room)
-      this.props.socket.emit('less bomb', this.state.room)
+      this.props.socket.emit('drew card', gameDeck, newPlayersHand, 'A CAT DIED...', this.state.room)
+      //this.props.socket.emit('less bomb', this.state.room)
       this.endTurn('dead')
 
     } else if (drawnCard.type === "bomb" && hasDefuse > -1) {
       //console.log(`in drawACard(), you haz a bomb!!! and you gotta defuse`)
-      alert('Drew a bomb! GOOD THING ' + this.state.playerId + ' HAS A DEFUSE CARD!')
+      //alert('Drew a bomb! GOOD THING ' + this.state.playerId + ' HAS A DEFUSE CARD!')
       let allPlayersExceptCurrent = this.state.allPlayers.slice(1)
       let currentPlayerHand = Object.assign({}, currentPlayer)
       //currentPlayerHand.hand.splice(hasDefuse, 1)
+      //this.props.socket.emit('bomb defused', this.state.room)
       console.log('THIS IS THE VALUE OF hasDefuse ::::: ', hasDefuse)
       this.discardCard(hasDefuse)
 
@@ -221,7 +236,7 @@ export default class Game extends React.Component {
       }
 
 
-      this.props.socket.emit('drew card', gameDeck, newPlayersHand, this.state.room)
+      this.props.socket.emit('drew card', gameDeck, newPlayersHand, 'BOMB DEFUSED', this.state.room)
 
       this.endTurn()
 
@@ -245,7 +260,7 @@ export default class Game extends React.Component {
       }
 
       console.log('THIS IS THE NEW HAND AFTER CLICKING DRAW BEFORE THE EMIT ::::: ', JSON.stringify(currentPlayerWithUpdatedHand))
-      this.props.socket.emit('drew card', gameDeck, newPlayersHand, this.state.room)
+      this.props.socket.emit('drew card', gameDeck, newPlayersHand, 'DREW A CARD', this.state.room)
 
       this.endTurn()
     }
