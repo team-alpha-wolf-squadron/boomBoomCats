@@ -223,8 +223,6 @@ export default class Game extends React.Component {
   }
 
 
-
-
   endTurn(status) {
     let gameTurns = this.state.turn.slice()
 
