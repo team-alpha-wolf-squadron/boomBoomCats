@@ -10,6 +10,7 @@ const InitializedView = (props) => {
   //var deathChance = Math.round((props.exploderCount / props.deck.length) * 100)
   return (
     <div className='gameTable'>
+      {console.log(`props.exploderCount ${props.exploderCount} and props.deck.length ${props.deck.length}`)}
       <Opponents opponents={props.opponents} opponentsUsernames={props.opponentsUsernames} currentPlayerTurn={props.currentPlayerTurn} />
       <div className="row text-center">
         <Deck deck={props.deck} isPlayerTurn={props.isPlayerTurn} handleDeckClick={props.handleDeckClick}/>

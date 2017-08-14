@@ -81,7 +81,7 @@ export default class Game extends React.Component {
       console.log('THIS IS THE NEW HAND FOR THE PLAYER :::: ', this.state.allPlayers[0].hand)
     }.bind(this))
 
-    this.props.socket.on('update turn', function(newTurn) {
+    this.props.socket.on('update turn', function(newTurn, newBombCount) {
       this.setState({
         turn: newTurn,
         exploderCount: newBombCount
@@ -214,7 +214,7 @@ export default class Game extends React.Component {
 
   endTurn(status) {
     let gameTurns = this.state.turn.slice()
-
+    let newBombCount = this.state.exploderCount
     //if there's been an attack or player dead, get rid of the duplicate since it's a one-time thing
     if ( status === 'dead') {
       let playerWhoEndedTurn = gameTurns.shift()
@@ -224,6 +224,8 @@ export default class Game extends React.Component {
       for (var i = this.state.allPlayers[this.state.playerIndex].hand.length-1; i >= 0; i--) {
         this.discardCard(i)
       }
+      newBombCount = this.state.exploderCount - 1
+
       this.setState({
         exploderCount: this.state.exploderCount - 1
       })
@@ -237,7 +239,7 @@ export default class Game extends React.Component {
     }
     // this.setState({ turn: gameTurns })
 
-    this.props.socket.emit('ended turn', gameTurns)
+    this.props.socket.emit('ended turn', gameTurns, newBombCount)
     console.log('this is the the game turn', gameTurns)
   }
 
