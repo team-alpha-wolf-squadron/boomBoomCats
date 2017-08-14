@@ -10,8 +10,7 @@ const PORT = process.env.PORT || 3000
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 let db // mongo
-
-const dbURL = process.env.dbURL || require('../env/config.js');
+const dbURL = /*process.env.dbURL //TODO: remove // for dev||*/ require('../env/config.js');
 const createGameState = require('./createGameState')
 
 app.use(parser.urlencoded({extended: true}))
@@ -77,6 +76,11 @@ io.on('connection', function(socket) {
     io.to(room).emit('update turn', newTurns, newBombCount)
   })
 
+  socket.on('skip turn', function(room) {
+    console.log(room, ': player skipped.')
+    io.to(room).emit('turn skipped')
+  })
+
   socket.on('ended turn', function(newTurns, newBombCount, room) {
     console.log(room, ': WE ENDED THE TURN THIS IS FROM THE SERVER :::: ', newTurns)
     io.to(room).emit('update turn', newTurns, newBombCount)
@@ -84,6 +88,10 @@ io.on('connection', function(socket) {
 
   socket.on('less bomb', function(room) {
     io.to(room).emit('bomb less')
+  })
+
+  socket.on('player died', function(room, newBombCount) {
+    io.to(room).emit('update bombCount', newBombCount)
   })
 
   socket.on('game over', function(room) {

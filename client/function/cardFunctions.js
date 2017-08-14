@@ -54,13 +54,14 @@ module.exports = {
             turn: newTurns
         }, () => {
             this.discardCard(cardPosition); 
-            cb();
-            this.endTurn(); 
+            cb()
+            this.endTurn()
             })
     },
-    skipATurn: function (cardPosition) {
+    skipATurn: function (cardPosition, cb) {
         console.log('skip')
         this.discardCard(cardPosition)
+        cb()
         this.endTurn()
     }
 

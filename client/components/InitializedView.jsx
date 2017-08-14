@@ -3,6 +3,7 @@ import Opponents from './Opponents.jsx'
 import Player from './Player.jsx'
 import Deck from './Deck.jsx'
 import DiscardPile from './DiscardPile.jsx'
+import Status from './Status.jsx'
 
 const InitializedView = (props) => {
   // console.log('ATTN: hitting the initilized view')
@@ -13,6 +14,7 @@ const InitializedView = (props) => {
       {console.log(`props.exploderCount ${props.exploderCount} and props.deck.length ${props.deck.length}`)}
       <Opponents opponents={props.opponents} opponentsUsernames={props.opponentsUsernames} currentPlayerTurn={props.currentPlayerTurn} />
       <div className="row text-center">
+        <Status status={props.status}/>
         <Deck deck={props.deck} isPlayerTurn={props.isPlayerTurn} handleDeckClick={props.handleDeckClick}/>
         <DiscardPile discard={props.discard}/>
         {props.gameOver ? <h3 id='winner'>{props.winner} is the winner!</h3> : <h3 id='calculation'>You have a {Math.round((props.exploderCount / props.deck.length) * 100)}% chance of blowing up!</h3>}
