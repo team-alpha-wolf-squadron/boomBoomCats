@@ -45,7 +45,7 @@ io.on('connection', function(socket) {
       roomnum++
     }
     console.log(newRoom)
-    io.to(newRoom).emit('new opponent', roomUsers)
+    io.to(newRoom).emit('new opponent', roomUsers, newRoom)
 
   })
 
@@ -102,7 +102,7 @@ io.on('connection', function(socket) {
   })
 
   socket.on('chat message', function(msg, room) {
-    io.to(room).emit('chat message', msg, users[socket.id])
+    io.emit('chat message', msg, users[socket.id])
   })
 
   socket.on('disconnect', function() {
