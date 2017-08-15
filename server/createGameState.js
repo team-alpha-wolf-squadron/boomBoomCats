@@ -31,7 +31,7 @@ let createGameState = function(callback) {
         let randomIndex = Math.floor(Math.random() * (max - min + 1)) + min
         shuffledDeck.push(orderedDeck[randomIndex])
         orderedDeck.splice(randomIndex, 1)
-        console.log(`card at index ${shuffledDeck.length-1} is ${shuffledDeck[shuffledDeck.length-1].name}`)
+        // console.log(`card at index ${shuffledDeck.length-1} is ${shuffledDeck[shuffledDeck.length-1].name}`)
       }
 
       //save the normal cards to the deck
@@ -94,9 +94,9 @@ let createGameState = function(callback) {
           console.log(`There are now ${gameState.deck.length} cards in the deck after bomb card initialization.
           `)
 
-          gameState.deck.forEach( (card,i) => {
-            console.log(`card at index ${i} is ${card.name}`)
-          })
+          // gameState.deck.forEach( (card,i) => {
+          //   console.log(`card at index ${i} is ${card.name}`)
+          // })
 
           console.log('now in the callback portion')
           if (callback) {

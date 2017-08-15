@@ -31,6 +31,8 @@ npm start
 
 - Node 7.10.0
 - Webpack ^3.4.1
+- mlab.com mongoDB deployment
+- Auth0 dev account
 
 ## Development
 
